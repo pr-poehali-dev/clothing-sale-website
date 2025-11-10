@@ -4,6 +4,8 @@ import { products } from '@/data/products';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import ProductDetail from '@/components/ProductDetail';
 import {
   Select,
   SelectContent,
@@ -20,6 +22,7 @@ const Catalog = ({ onAddToCart }: CatalogProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Все');
   const [selectedSize, setSelectedSize] = useState<string>('Все');
   const [selectedColor, setSelectedColor] = useState<string>('Все');
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const categories = ['Все', 'Верхняя одежда', 'Платья', 'Брюки', 'Аксессуары'];
   const sizes = ['Все', 'XS', 'S', 'M', 'L', 'XL', 'Один размер'];
@@ -32,10 +35,12 @@ const Catalog = ({ onAddToCart }: CatalogProps) => {
     return categoryMatch && sizeMatch && colorMatch;
   });
 
-  const handleAddToCart = (product: Product) => {
-    const defaultSize = product.sizes[0];
-    const defaultColor = product.colors[0];
-    onAddToCart(product, defaultSize, defaultColor);
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+  };
+
+  const handleCloseDetail = () => {
+    setSelectedProduct(null);
   };
 
   return (
@@ -109,9 +114,9 @@ const Catalog = ({ onAddToCart }: CatalogProps) => {
                 </div>
                 <Button
                   className="w-full"
-                  onClick={() => handleAddToCart(product)}
+                  onClick={() => handleProductClick(product)}
                 >
-                  Добавить в корзину
+                  Подробнее
                 </Button>
               </CardContent>
             </Card>
@@ -126,6 +131,18 @@ const Catalog = ({ onAddToCart }: CatalogProps) => {
           </div>
         )}
       </div>
+
+      <Dialog open={!!selectedProduct} onOpenChange={handleCloseDetail}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          {selectedProduct && (
+            <ProductDetail
+              product={selectedProduct}
+              onAddToCart={onAddToCart}
+              onClose={handleCloseDetail}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };
